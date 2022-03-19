@@ -1,4 +1,4 @@
-BINARY=monaco
+EXECUTABLE=monaco
 
 .PHONY: lint format mocks build install clean test integration-test test-package default add-license-headers
 
@@ -29,21 +29,22 @@ mocks:
 	@go generate ./...
 
 build: clean lint
-	@echo Build ${BINARY}
-	@go build ./...
-	@go build -o ./bin/${BINARY} ./cmd/monaco
+	GOOS=windows GOARCH=amd64 go build -o ./bin/${EXECUTABLE}-windows-amd64.exe ./cmd/monaco
+	GOOS=windows GOARCH=386 go build -o ./bin/${EXECUTABLE}-windows-386.exe ./cmd/monaco
+	GOOS=linux GOARCH=amd64 go build -o ./bin/${EXECUTABLE}-linux-amd64 ./cmd/monaco
+	GOOS=linux GOARCH=386 go build -o ./bin/${EXECUTABLE}-linux-386 ./cmd/monaco
+	GOOS=darwin GOARCH=amd64 go build -o ./bin/${EXECUTABLE}-darwin-amd64 ./cmd/monaco
+	GOOS=darwin GOARCH=arm64 go build -o ./bin/${EXECUTABLE}-darwin-386 ./cmd/monaco
 
 install: clean lint
-	@echo Install ${BINARY}
+	@echo Install ${EXECUTABLE}
 	@go install ./...
 
 clean:
-	@echo Remove ${BINARY} and bin/
+	@echo Remove bin/
 ifeq ($(OS),Windows_NT)
-	@if exist ${BINARY} del /Q ${BINARY}
 	@if exist bin rd /S /Q bin
 else
-	@rm -f ${BINARY}
 	@rm -rf bin/
 endif
 
